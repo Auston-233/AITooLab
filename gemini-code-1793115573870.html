@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AITooLab - 全球 50+ 顶尖 AI 工具与应用导航</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 自定义霓虹光晕背景与毛玻璃特效 */
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        .bg-glow {
+            position: absolute;
+            top: -10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.1) 40%, rgba(15, 23, 42, 0) 70%);
+            filter: blur(50px);
+            z-index: 0;
+            pointer-events: none;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(168, 85, 247, 0.4);
+            box-shadow: 0 10px 25px -5px rgba(168, 85, 247, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+        }
+        .tag-active {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body class="min-h-screen relative overflow-x-hidden flex flex-col">
+
+    <!-- 顶部背景光晕 -->
+    <div class="bg-glow"></div>
+
+    <!-- 顶部导航栏 -->
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-slate-900/80 border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-indigo-500/30">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <span class="text-xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">AITooLab</span>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <button id="favoriteToggleBtn" class="px-3 py-1.5 text-sm rounded-lg border border-slate-700 bg-slate-800/50 hover:bg-slate-700 text-slate-300 hover:text-white transition flex items-center gap-2">
+                    <i class="fa-solid fa-bookmark text-amber-400"></i>
+                   <span>我的收藏</span>
+                    <span id="favCount" class="ml-1 px-1.5 py-0.2 bg-purple-500/20 text-purple-300 rounded-full text-xs">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 头部 Hero 区域 -->
+    <section class="relative z-10 pt-12 pb-8 px-4 sm:px-6 text-center max-w-4xl mx-auto">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-purple-500/30 bg-purple-500/10 text-purple-300 text-xs font-medium mb-6 backdrop-blur-sm">
+            <span class="flex h-2 w-2 rounded-full bg-purple-400 animate-pulse"></span>
+            已精选收录 50 款顶级 AI 生产力工具
+        </div>
+        <h1 class="text-4xl sm:text-6xl font-extrabold text-white tracking-tight leading-tight mb-4">
+            探索全球顶尖 <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">AI 工具与应用</span>
+        </h1>
+        <p class="text-slate-400 text-base sm:text-lg mb-8 max-w-2xl mx-auto">
+            发现最新的人工智能软件，涵盖文本生成、图像创作、代码编写、音视频处理等全方位生产力工具。
+        </p>
+
+        <!-- 搜索框 -->
+        <div class="relative max-w-2xl mx-auto">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                <i class="fa-solid fa-magnifying-glass text-lg"></i>
+            </div>
+            <input type="text" id="searchInput" placeholder="搜索工具名称、功能或关键词..." 
+                class="w-full pl-11 pr-24 py-4 rounded-2xl bg-slate-800/80 border border-slate-700/80 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition shadow-2xl backdrop-blur-md">
+            <button id="clearSearchBtn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 px-3 py-1.5 text-xs rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 transition">
+                清除
+            </button>
+        </div>
+    </section>
+
+    <!-- 核心功能与卡片展示区 -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full z-10">
+        
+        <!-- 分类 Filter 标签页 -->
+        <div class="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pb-4 mb-8 no-scrollbar" id="categoryTags">
+            <button class="tag-btn tag-active px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition cursor-pointer" data-category="all">
+                <i class="fa-solid fa-border-all mr-1.5"></i>全部 (50)
+            </button>
+            <button class="tag-btn px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap text-slate-400 hover:text-white hover:bg-slate-800/60 transition cursor-pointer" data-category="text">
+                <i class="fa-solid fa-pen-nib mr-1.5"></i>文本与对话
+            </button>
+            <button class="tag-btn px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap text-slate-400 hover:text-white hover:bg-slate-800/60 transition cursor-pointer" data-category="image">
+                <i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i>图像与绘画
+            </button>
+            <button class="tag-btn px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap text-slate-400 hover:text-white hover:bg-slate-800/60 transition cursor-pointer" data-category="code">
+                <i class="fa-solid fa-code mr-1.5"></i>编程辅助
+            </button>
+            <button class="tag-btn px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap text-slate-400 hover:text-white hover:bg-slate-800/60 transition cursor-pointer" data-category="media">
+                <i class="fa-solid fa-video mr-1.5"></i>音视频生成
+            </button>
+            <button class="tag-btn px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap text-slate-400 hover:text-white hover:bg-slate-800/60 transition cursor-pointer" data-category="office">
+                <i class="fa-solid fa-briefcase mr-1.5"></i>办公与效率
+            </button>
+        </div>
+
+        <!-- 卡片网格 -->
+        <div id="toolsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- 动态通过 JavaScript 渲染卡片内容 -->
+        </div>
+
+        <!-- 搜不到结果提示 -->
+        <div id="noResults" class="hidden text-center py-16">
+            <i class="fa-solid fa-ghost text-5xl text-slate-600 mb-4"></i>
+            <h3 class="text-lg font-medium text-slate-300">未找到相关 AI 工具</h3>
+            <p class="text-slate-500 text-sm mt-1">尝试换一个关键词或在其他分类中寻找</p>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="border-t border-slate-800 bg-slate-950/50 mt-16 py-8 z-10">
+        <div class="max-w-7xl mx-auto px-4 text-center text-slate-500 text-sm">
+            <p>© 2026 AITooLab. 汇聚全球 50 款顶级 AI 生产力工具.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript 脚本 -->
+    <script>
+        // 50 个 AI 工具精选数据源
+        const toolsData = [
+            // --- 1. 文本与对话 (12个) ---
+            { id: '1', name: 'ChatGPT', category: 'text', desc: 'OpenAI 旗下的王牌大模型，擅长智能对话、文案创作、逻辑推理及多模态交互。', icon: 'fa-robot', gradient: 'from-emerald-500 to-teal-700', pricing: '免费 / 订阅', url: 'https://chat.openai.com', badge: '热门' },
+            { id: '2', name: 'Claude 3.5', category: 'text', desc: 'Anthropic 开发的高智能 AI 助手，在代码生成、长文本理解与逻辑推理上表现卓越。', icon: 'fa-brain', gradient: 'from-amber-500 to-orange-700', pricing: '免费 / 订阅', url: 'https://claude.ai', badge: '强大' },
+            { id: '3', name: 'Perplexity AI', category: 'text', desc: '结合大模型与实时联网搜索的 AI 搜索引擎，回答附带权威来源引用，查资料神器。', icon: 'fa-compass', gradient: 'from-teal-500 to-emerald-800', pricing: '免费 / 订阅', url: 'https://www.perplexity.ai', badge: '推荐' },
+            { id: '4', name: 'Google Gemini', category: 'text', desc: '谷歌打造的原生多模态大模型，深度集成 Google 生态，擅长文本、代码和图像解析。', icon: 'fa-sparkles', gradient: 'from-blue-500 to-cyan-600', pricing: '免费 / 订阅', url: 'https://gemini.google.com', badge: '' },
+            { id: '5', name: 'DeepSeek', category: 'text', desc: '国产高性价比开源大模型，在数学、推理及编程任务上表现媲美顶尖闭源模型。', icon: 'fa-fish', gradient: 'from-blue-600 to-indigo-800', pricing: '免费 / API', url: 'https://chat.deepseek.com', badge: '国产黑马' },
+            { id: '6', name: 'Kimi 智能助手', category: 'text', desc: '月之暗面推出的长文本 AI 助手，支持输入数十万字超长资料并快速提炼与解答。', icon: 'fa-moon', gradient: 'from-indigo-500 to-purple-800', pricing: '免费', url: 'https://kimi.moonshot.cn', badge: '长文本' },
+            { id: '7', name: '智谱清言 (GLM)', category: 'text', desc: '基于 ChatGLM 大模型的全能 AI 助手，具备强劲的写作、代码生成与数据分析能力。', icon: 'fa-feather', gradient: 'from-cyan-600 to-blue-800', pricing: '免费', url: 'https://chatglm.cn', badge: '' },
+            { id: '8', name: '文心一言', category: 'text', desc: '百度推出的知识增强大语言模型，具备强大的中文理解、诗词创作及商业文案撰写能力。', icon: 'fa-comments', gradient: 'from-blue-500 to-sky-700', pricing: '免费 / 付费', url: 'https://yiyan.baidu.com', badge: '' },
+            { id: '9', name: '通义千问', category: 'text', desc: '阿里云打造的超大规模语言模型，支持多语言对话、文档总结、代码编写及多模态交互。', icon: 'fa-cubes', gradient: 'from-purple-600 to-pink-700', pricing: '免费', url: 'https://tongyi.aliyun.com', badge: '' },
+            { id: '10', name: 'Poe', category: 'text', desc: 'Quora 打造的 AI 聚合平台，允许用户在一个界面内无缝切换和对比各种顶尖大模型。', icon: 'fa-layer-group', gradient: 'from-violet-600 to-indigo-900', pricing: '免费 / 订阅', url: 'https://poe.com', badge: '聚合' },
+            { id: '11', name: 'Mistral AI', category: 'text', desc: '欧洲顶级开源大模型团队，提供轻量高效且能力超强的开源大语言模型与 API。', icon: 'fa-wind', gradient: 'from-orange-500 to-red-700', pricing: '开源 / 付费', url: 'https://mistral.ai', badge: '极客' },
+            { id: '12', name: 'Jasper AI', category: 'text', desc: '专为企业营销人员打造的 AI 写作工具，支持快速生成博客、社交媒体文案和广告语。', icon: 'fa-bullhorn', gradient: 'from-rose-500 to-pink-700', pricing: '付费', url: 'https://www.jasper.ai', badge: '' },
+
+            // --- 2. 图像与绘画 (10个) ---
+            { id: '13', name: 'Midjourney', category: 'image', desc: '顶尖的 AI 图像生成工具，通过文本提示词快速生成极具艺术感与写实风格的高清图片。', icon: 'fa-palette', gradient: 'from-purple-500 to-indigo-700', pricing: '付费', url: 'https://www.midjourney.com', badge: '推荐' },
+            { id: '14', name: 'Stable Diffusion', category: 'image', desc: '开源且高度可定制的 AI 绘画大模型，支持本地部署与 LoRA 插件扩展，控制力极强。', icon: 'fa-image', gradient: 'from-blue-600 to-indigo-900', pricing: '开源免费', url: 'https://stability.ai', badge: '开源' },
+            { id: '15', name: 'DALL-E 3', category: 'image', desc: 'OpenAI 深度融合 ChatGPT 的图像生成模型，对长句提示词的理解能力极强。', icon: 'fa-brush', gradient: 'from-emerald-600 to-teal-800', pricing: '包含在 GPT-4', url: 'https://openai.com/dall-e-3', badge: '' },
+            { id: '16', name: 'FLUX.1', category: 'image', desc: '黑马级开源图像生成模型，在人体细节、文字渲染与画质真实度上刷新行业标杆。', icon: 'fa-bolt', gradient: 'from-amber-500 to-yellow-600', pricing: '开源 / API', url: 'https://blackforestlabs.ai', badge: '画质黑马' },
+            { id: '17', name: 'Leonardo.ai', category: 'image', desc: '功能丰富的云端 AI 绘画与游戏素材生成平台，界面友好且提供每天免费额度。', icon: 'fa-gamepad', gradient: 'from-fuchsia-600 to-pink-800', pricing: '免费 / 订阅', url: 'https://leonardo.ai', badge: '' },
+            { id: '18', name: 'Canva AI', category: 'image', desc: '知名设计软件集成的 AI 图像与设计工具，支持魔术橡皮擦、一键扩图与智能排版。', icon: 'fa-pen-ruler', gradient: 'from-cyan-500 to-blue-600', pricing: '免费 / 订阅', url: 'https://www.canva.com', badge: '' },
+            { id: '19', name: 'Magnific AI', category: 'image', desc: '超强 AI 图像高清放大与细节增强修复工具，能为低分辨率图片补充惊人的细节。', icon: 'fa-expand', gradient: 'from-violet-500 to-purple-800', pricing: '付费', url: 'https://magnific.ai', badge: '黑科技' },
+            { id: '20', name: 'Adobe Firefly', category: 'image', desc: 'Adobe 官方出品的安全生成式 AI，已无缝嵌入 Photoshop 等软件，支持生成式填色。', icon: 'fa-fire', gradient: 'from-red-600 to-orange-600', pricing: '免费 / 订阅', url: 'https://firefly.adobe.com', badge: '' },
+            { id: '21', name: ' Remove.bg', category: 'image', desc: '基于 AI 的秒级图片自动去背景抠图工具，边缘处理精细，设计必备。', icon: 'fa-scissors', gradient: 'from-sky-500 to-indigo-600', pricing: '免费 / 付费', url: 'https://www.remove.bg', badge: '' },
+            { id: '22', name: '堆友 AI', category: 'image', desc: '阿里巴巴推出的零门槛 AI 多模态创作平台，内置海量风格模型与 3D 素材生成。', icon: 'fa-cubes-stacked', gradient: 'from-orange-500 to-amber-600', pricing: '免费', url: 'https://d.design', badge: '' },
+
+            // --- 3. 编程辅助 (8个) ---
+            { id: '23', name: 'GitHub Copilot', category: 'code', desc: '微软与 OpenAI 联合打造的 AI 编程助手，在编辑器中实时为你补全代码与函数。', icon: 'fa-code', gradient: 'from-slate-600 to-slate-900', pricing: '付费', url: 'https://github.com/features/copilot', badge: '行业标准' },
+            { id: '24', name: 'Cursor', category: 'code', desc: '专为 AI 打造的全新智能代码编辑器，集成强大的代码库问答与全项目重构能力。', icon: 'fa-terminal', gradient: 'from-cyan-500 to-blue-700', pricing: '免费 / 付费', url: 'https://www.cursor.com', badge: '极客爆款' },
+            { id: '25', name: 'v0 by Vercel', category: 'code', desc: '输入自然语言描述即可自动生成高度可用的 React + Tailwind CSS 前端 UI 组件。', icon: 'fa-laptop-code', gradient: 'from-zinc-700 to-black', pricing: '免费 / 订阅', url: 'https://v0.dev', badge: '前端神器' },
+            { id: '26', name: 'Replit Agent', category: 'code', desc: '智能 AI 软件开发代理，能根据需求全自动编写、安装依赖并部署整套全栈应用。', icon: 'fa-network-wired', gradient: 'from-red-500 to-rose-700', pricing: '订阅', url: 'https://replit.com', badge: '全自动' },
+            { id: '27', name: 'Codeium', category: 'code', desc: '免费且强劲的个人 AI 代码补全工具，支持 70+ 种语言和几乎所有主流 IDE。', icon: 'fa-laptop-file', gradient: 'from-emerald-500 to-green-700', pricing: '个人免费', url: 'https://codeium.com', badge: '免费' },
+            { id: '28', name: 'Tabnine', category: 'code', desc: '老牌 AI 代码补全插件，支持私有化部署与团队代码库个性化训练。', icon: 'fa-keyboard', gradient: 'from-blue-600 to-violet-800', pricing: '免费 / 付费', url: 'https://www.tabnine.com', badge: '' },
+            { id: '29', name: 'Devin', category: 'code', desc: 'Cognition 推出的全球首位 AI 软件工程师，能独立规划并解决复杂的编程任务。', icon: 'fa-user-gear', gradient: 'from-indigo-600 to-purple-900', pricing: '邀测', url: 'https://www.cognition.ai', badge: '前沿' },
+            { id: '30', name: 'CodeRabbit', category: 'code', desc: '基于 AI 的 Code Review 工具，自动在 GitHub Pull Request 中指出潜在 Bug 和优化建议。', icon: 'fa-bug-slash', gradient: 'from-orange-600 to-red-700', pricing: '免费 / 订阅', url: 'https://coderabbit.ai', badge: '' },
+
+            // --- 4. 音视频生成 (10个) ---
+            { id: '31', name: 'Sora', category: 'media', desc: 'OpenAI 颠覆性的视频生成模型，能根据简单文字描述生成长达 60 秒的高清连贯视频。', icon: 'fa-film', gradient: 'from-red-500 to-pink-700', pricing: '受限访问', url: 'https://openai.com/sora', badge: '突破性' },
+            { id: '32', name: 'Runway Gen-2/Gen-3', category: 'media', desc: '领先的文本/图片转视频工具，支持精细的镜头运动控制与多风格高品质视频生成。', icon: 'fa-video', gradient: 'from-fuchsia-500 to-purple-800', pricing: '免费试用 / 订阅', url: 'https://runwayml.com', badge: '推荐' },
+            { id: '33', name: 'Suno AI', category: 'media', desc: '只需输入歌词或风格描述，AI 就能在数秒内为你创作并演唱出完整的高品质歌曲。', icon: 'fa-music', gradient: 'from-pink-500 to-rose-700', pricing: '免费 / 订阅', url: 'https://suno.com', badge: '爆款' },
+            { id: '34', name: 'Udio', category: 'media', desc: '强劲的 AI 音乐生成平台，音质精良且支持对歌曲段落进行精准扩展与编辑。', icon: 'fa-headphones', gradient: 'from-blue-500 to-indigo-700', pricing: '免费 / 订阅', url: 'https://www.udio.com', badge: '' },
+            { id: '35', name: 'ElevenLabs', category: 'media', desc: '业内最写实的 AI 语音合成与声音克隆平台，支持多语言且带有极富感情的语气。', icon: 'fa-microphone', gradient: 'from-emerald-500 to-teal-800', pricing: '免费 / 订阅', url: 'https://elevenlabs.io', badge: '配音首选' },
+            { id: '36', name: 'HeyGen', category: 'media', desc: '打造超写实数字人播报视频的 AI 平台，支持视频自动一键翻译并匹配口型。', icon: 'fa-circle-user', gradient: 'from-purple-600 to-violet-900', pricing: '免费试用 / 订阅', url: 'https://www.heygen.com', badge: '数字人' },
+            { id: '37', name: 'Luma Dream Machine', category: 'media', desc: 'Luma AI 推出的高效视频生成大模型，生成的物体动态流畅自然，速度极快。', icon: 'fa-camera-rotate', gradient: 'from-amber-600 to-orange-700', pricing: '免费 / 订阅', url: 'https://lumalabs.ai/dream-machine', badge: '' },
+            { id: '38', name: 'Pika Labs', category: 'media', desc: '好用的 AI 视频生成工具，支持对局部视频进行 AI 修改、添加物体及修改画幅。', icon: 'fa-clapperboard', gradient: 'from-yellow-500 to-amber-700', pricing: '免费 / 订阅', url: 'https://pika.art', badge: '' },
+            { id: '39', name: '可灵 AI (Kling)', category: 'media', desc: '快手推出的顶级 AI 视频生成大模型，支持高帧率、大运动幅度视频的轻松生成。', icon: 'fa-play', gradient: 'from-red-600 to-rose-800', pricing: '免费 / 订阅', url: 'https://klingai.kuaishou.com', badge: '国产高光' },
+            { id: '40', name: '智谱清影 (Ying)', category: 'media', desc: '智谱 AI 推出的文生视频/图生视频平台，6秒快速生成高质量连贯视频。', icon: 'fa-wand-magic', gradient: 'from-teal-600 to-cyan-800', pricing: '免费', url: 'https://ying.zhipuai.cn', badge: '' },
+
+            // --- 5. 办公与生产力 (10个) ---
+            { id: '41', name: 'Gamma App', category: 'office', desc: '用 AI 几秒内自动生成精美幻灯片 (PPT)、网页及文档，摆脱传统排版繁琐流程。', icon: 'fa-display', gradient: 'from-violet-500 to-purple-700', pricing: '免费 / 订阅', url: 'https://gamma.app', badge: '高效' },
+            { id: '42', name: 'Notion AI', category: 'office', desc: '无缝嵌入 Notion 笔记中的 AI 写作与整理工具，提炼总结、草拟文章一步到位。', icon: 'fa-file-lines', gradient: 'from-blue-500 to-cyan-700', pricing: '付费扩展', url: 'https://www.notion.so', badge: '' },
+            { id: '43', name: '秘塔 AI 搜索', category: 'office', desc: '无广告的智能搜索引擎，能快速生成结构化的研究报告、大纲与思维导图。', icon: 'fa-magnifying-glass-chart', gradient: 'from-indigo-600 to-blue-800', pricing: '免费', url: 'https://metaso.cn', badge: '学术办公' },
+            { id: '44', name: ' Otter.ai', category: 'office', desc: '智能 AI 会议纪要助手，自动转录会议语音、提取核心要点并分配行动项。', icon: 'fa-volume-high', gradient: 'from-sky-500 to-blue-700', pricing: '免费 / 订阅', url: 'https://otter.ai', badge: '' },
+            { id: '45', name: 'NotebookLM', category: 'office', desc: '谷歌推出的 AI 个人笔记研究工具，能根据你上传的 PDF 和笔记生成专业问答与播客。', icon: 'fa-book-open', gradient: 'from-emerald-600 to-teal-800', pricing: '免费', url: 'https://notebooklm.google.com', badge: '神器' },
+            { id: '46', name: 'Readwise Reader', category: 'office', desc: '集成 AI 辅助阅读的现代稍后阅读应用，能快速总结长文章与网页重点。', icon: 'fa-book-bookmark', gradient: 'from-amber-600 to-orange-700', pricing: '订阅', url: 'https://readwise.io/read', badge: '' },
+            { id: '47', name: 'ChatPDF', category: 'office', desc: '与任何 PDF 文档进行 AI 对话，快速提取论点、解答疑问，文献阅读利器。', icon: 'fa-file-pdf', gradient: 'from-red-500 to-rose-700', pricing: '免费 / 订阅', url: 'https://www.chatpdf.com', badge: '' },
+            { id: '48', name: 'DeepL Translate', category: 'office', desc: '利用神经网络的高精准翻译工具，译文自然顺畅，远超传统机械翻译。', icon: 'fa-language', gradient: 'from-slate-700 to-blue-900', pricing: '免费 / 订阅', url: 'https://www.deepl.com', badge: '翻译首选' },
+            { id: '49', name: 'SlidesAI', category: 'office', desc: '一键将任意文本转换为 Google Slides 演示文稿的 AI 扩展插件。', icon: 'fa-file-powerpoint', gradient: 'from-yellow-500 to-amber-700', pricing: '免费 / 订阅', url: 'https://www.slidesai.io', badge: '' },
+            { id: '50', name: 'Make (Integromat)', category: 'office', desc: '强大的无代码自动化流程连接平台，支持将各种 AI 工具与你的日常软件无缝整合。', icon: 'fa-diagram-project', gradient: 'from-purple-600 to-fuchsia-800', pricing: '免费 / 订阅', url: 'https://www.make.com', badge: '自动化' }
+        ];
+
+        // 状态变量
+        let currentCategory = 'all';
+        let searchQuery = '';
+        let favorites = JSON.parse(localStorage.getItem('ai_hub_favs') || '[]');
+        let showFavoritesOnly = false;
+
+        // DOM 元素引用
+        const toolsGrid = document.getElementById('toolsGrid');
+        const noResults = document.getElementById('noResults');
+        const searchInput = document.getElementById('searchInput');
+        const clearSearchBtn = document.getElementById('clearSearchBtn');
+        const categoryTags = document.getElementById('categoryTags');
+        const favCount = document.getElementById('favCount');
+        const favoriteToggleBtn = document.getElementById('favoriteToggleBtn');
+
+        // 初始化页面
+        function init() {
+            updateFavCount();
+            renderTools();
+            bindEvents();
+        }
+
+        // 绑定事件处理
+        function bindEvents() {
+            // 搜索框输入事件
+            searchInput.addEventListener('input', (e) => {
+                searchQuery = e.target.value.trim().toLowerCase();
+                clearSearchBtn.classList.toggle('hidden', searchQuery === '');
+                renderTools();
+            });
+
+            // 清除搜索按钮
+            clearSearchBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                searchQuery = '';
+                clearSearchBtn.classList.add('hidden');
+                renderTools();
+            });
+
+            // 分类标签点击
+            categoryTags.addEventListener('click', (e) => {
+                const btn = e.target.closest('.tag-btn');
+                if (!btn) return;
+
+                // 退出“仅看收藏”状态
+                showFavoritesOnly = false;
+                favoriteToggleBtn.classList.remove('border-amber-500/50', 'bg-amber-500/10');
+
+                // 切换样式
+                document.querySelectorAll('.tag-btn').forEach(b => {
+                    b.classList.remove('tag-active');
+                    b.classList.add('text-slate-400');
+                });
+                btn.classList.add('tag-active');
+                btn.classList.remove('text-slate-400');
+
+                currentCategory = btn.dataset.category;
+                renderTools();
+            });
+
+            // 我的收藏按钮切换
+            favoriteToggleBtn.addEventListener('click', () => {
+                showFavoritesOnly = !showFavoritesOnly;
+                
+                if (showFavoritesOnly) {
+                    favoriteToggleBtn.classList.add('border-amber-500/50', 'bg-amber-500/10');
+                    // 清除分类的高亮
+                    document.querySelectorAll('.tag-btn').forEach(b => b.classList.remove('tag-active'));
+                } else {
+                    favoriteToggleBtn.classList.remove('border-amber-500/50', 'bg-amber-500/10');
+                    // 还原到“全部”标签
+                    document.querySelector('[data-category="all"]').classList.add('tag-active');
+                    currentCategory = 'all';
+                }
+                renderTools();
+            });
+        }
+
+        // 渲染卡片列表
+        function renderTools() {
+            const filtered = toolsData.filter(tool => {
+                // 分类匹配
+                const matchesCategory = showFavoritesOnly ? true : (currentCategory === 'all' || tool.category === currentCategory);
+                // 搜索匹配 (名字, 描述, 分类)
+                const matchesSearch = tool.name.toLowerCase().includes(searchQuery) || 
+                                     tool.desc.toLowerCase().includes(searchQuery);
+                // 收藏匹配
+                const matchesFav = showFavoritesOnly ? favorites.includes(tool.id) : true;
+
+                return matchesCategory && matchesSearch && matchesFav;
+            });
+
+            // 渲染控制
+            if (filtered.length === 0) {
+                toolsGrid.innerHTML = '';
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+                toolsGrid.innerHTML = filtered.map(tool => createCardHTML(tool)).join('');
+            }
+        }
+
+        // 生成单张卡片 HTML
+        function createCardHTML(tool) {
+            const isFav = favorites.includes(tool.id);
+            return `
+                <div class="glass-card rounded-2xl p-5 flex flex-col justify-between relative group">
+                    <div>
+                        <!-- 卡片头部: 图标与收藏按钮 -->
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr ${tool.gradient} flex items-center justify-center text-white text-xl shadow-md">
+                                <i class="fa-solid ${tool.icon}"></i>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                ${tool.badge ? `<span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">${tool.badge}</span>` : ''}
+                                <button onclick="toggleFavorite('${tool.id}')" class="text-slate-500 hover:text-amber-400 transition p-1 cursor-pointer">
+                                    <i class="${isFav ? 'fa-solid text-amber-400' : 'fa-regular'} fa-bookmark text-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 工具名称与描述 -->
+                        <h3 class="text-lg font-bold text-white mb-2 group-hover:text-purple-300 transition flex items-center gap-2">
+                            ${tool.name}
+                        </h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-4 line-clamp-3">
+                            ${tool.desc}
+                        </p>
+                    </div>
+
+                    <!-- 卡片底部: 价格标签与访问按钮 -->
+                    <div class="pt-4 border-t border-slate-700/50 flex items-center justify-between mt-auto">
+                        <span class="text-xs text-slate-500 font-medium">
+                            <i class="fa-solid fa-tag mr-1"></i>${tool.pricing}
+                        </span>
+                        <a href="${tool.url}" target="_blank" rel="noopener noreferrer" 
+                           class="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-purple-600 text-slate-200 hover:text-white border border-slate-700 hover:border-purple-500 transition">
+                            访问 <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                        </a>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 切换收藏状态
+        window.toggleFavorite = function(id) {
+            if (favorites.includes(id)) {
+                favorites = favorites.filter(favId => favId !== id);
+            } else {
+                favorites.push(id);
+            }
+            localStorage.setItem('ai_hub_favs', JSON.stringify(favorites));
+            updateFavCount();
+            renderTools();
+        };
+
+        // 更新收藏数量显示
+        function updateFavCount() {
+            favCount.textContent = favorites.length;
+        }
+
+        // 初始化
+        init();
+    </script>
+</body>
+</html>
